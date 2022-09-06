@@ -10,11 +10,10 @@ from constructs import Construct
 
 class ExpEC2(Stack):
 
-
-
     """EC2 instance construction"""
+
     def __init__(
-            self, scope: Construct, construct_id: str, target_vpc, **kwargs
+        self, scope: Construct, construct_id: str, target_vpc, **kwargs
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -35,6 +34,31 @@ class ExpEC2(Stack):
         role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name(
                 "CloudWatchLogsFullAccess"
+            )
+        )
+
+        role.add_to_policy(
+            iam.PolicyStatement(
+                resources=["*"], actions=["s3:ListAllMyBuckets"]
+            )
+        )
+
+        role.add_to_policy(
+            iam.PolicyStatement(
+                resources=[
+                    "arn:aws:s3:::com.imprivata.709310380790.us-east-1.devops-artifacts",
+                    "arn:aws:s3:::com.imprivata.709310380790.us-east-1.devops-artifacts/*",
+                ],
+                actions=["s3:ListBucket"],
+            )
+        )
+
+        role.add_to_policy(
+            iam.PolicyStatement(
+                resources=[
+                    "arn:aws:s3:::com.imprivata.709310380790.us-east-1.devops-artifacts/puppers/*"
+                ],
+                actions=["s3:GetObject"],
             )
         )
         self.instance = ec2.Instance(
